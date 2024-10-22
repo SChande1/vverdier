@@ -28,6 +28,7 @@ resjson = r.content.decode('utf8').replace("'", '"')
 bulkFiles = json.loads(resjson)
 
 dfBulkFiles = pd.DataFrame(bulkFiles)
+dfBulkFiles.to_csv(os.path.join(cemsdir, 'bulk_files.csv'), index=False)
 
 emissionsFiles = [fileObj for fileObj in bulkFiles if (fileObj['metadata']['dataType']=="Emissions")]
 hourlyEmissionsFiles = [fileObj for fileObj in emissionsFiles if (fileObj['metadata']['dataSubType']=="Hourly") and (int(fileObj['metadata']['year']) >= 2014)]
@@ -47,7 +48,11 @@ if len(hourlyEmissionsFiles) > 0:
         # download and save file
         response = requests.get(url)
         # save file to disk in the data folder
-        with open(os.path.join(cemsdir, fileObj['filename']), 'wb') as f:
+        if not os.path.exists(os.path.join(cemsdir, fileObj['metadata']['stateCode'])):
+            os.makedirs(os.path.join(cemsdir, fileObj['metadata']['stateCode']))
+
+        file_path = os.path.join(cemsdir, fileObj['metadata']['stateCode'], fileObj['metadata']['year'])
+        with open(file_path, 'wb') as f:
             f.write(response.content)
 else:
     print('No files to download')
