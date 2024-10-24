@@ -43,16 +43,20 @@ print('Total size of files to download: '+str(downloadMB)+' MB')
 if len(hourlyEmissionsFiles) > 0:
     # loop through all files and download them
     for fileObj in hourlyEmissionsFiles:
-        url = url_base+fileObj['s3Path']
-        print('Full path to file on S3: '+url)
+        url = url_base + fileObj['s3Path']
+        print('Full path to file on S3: ' + url)
         # download and save file
         response = requests.get(url)
+
         # save file to disk in the data folder
         if not os.path.exists(os.path.join(cemsdir, fileObj['metadata']['stateCode'])):
             os.makedirs(os.path.join(cemsdir, fileObj['metadata']['stateCode']))
 
-        file_path = os.path.join(cemsdir, fileObj['metadata']['stateCode'], fileObj['metadata']['year'])
+        file_path = os.path.join(cemsdir, fileObj['metadata']['stateCode'], fileObj['metadata']['year'] + '.csv')
         with open(file_path, 'wb') as f:
             f.write(response.content)
+
+        # Remove the fileObj from hourlyEmissionsFiles
+        hourlyEmissionsFiles.remove(fileObj)
 else:
     print('No files to download')
