@@ -80,24 +80,4 @@ def download_EIANuke_Outage():
     df_outage_sorted.to_csv(os.path.join(EIANuke_path, 'EIANuke_outage.csv'), index=False)
             
 
-
-
-
-
-
-
-
-
-        #     file_path = os.path.join(EIANuke_path, f'EIANuke_{year}_{month}.csv')
-        #     with open(file_path, 'wb') as f:
-        #         f.write(r.content)
-        #     df = pd.read_csv(file_path)
-        #     dfs_outages.append(df)
-        #     os.remove(file_path)
-
-        # #important to keep this here as it forces a sort of sleep to give the api a break and ensure the eia api doesn't throw a fit
-        # df_outage = pd.concat(dfs_outages)
-        # df_outage.to_csv(os.path.join(EIANuke_path, 'EIANuke_outage.csv'), index=False)
-
-    
-main()
+# main()

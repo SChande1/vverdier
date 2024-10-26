@@ -1,4 +1,4 @@
-import downloads.globals_regular as globals_regular
+import globals_regular as globals_regular
 import os, zipfile, requests
 
 rawdata_dir = globals_regular.config['rawdata_dir']
