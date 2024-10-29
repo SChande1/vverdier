@@ -48,7 +48,7 @@ for year in years:
             'Unit ID': 'unitid'
         }
         df.rename(columns=rename_dict, inplace=True)
-        print(df.columns)
+        
     
         
         df['maxgload'] = df.groupby('PLANT')['GLOAD'].transform('max')
@@ -73,13 +73,8 @@ for year in years:
         df_year.append(df)
     
     df_year = pd.concat(df_year, ignore_index=True)
-    df_year.to_pickle(f"{cemsdirreg}/emissions_all_unit_{year}.pkl")
+    df_year.to_pickle(f"{cemsdirreg}/plants and units in cems {year}.pkl")
     
-#     os.remove(f"{tempdir}/emissions_co2_unit_{year}.pkl")
-    
-#     for state in states:
-#         os.remove(f"{tempdir}/{state}{year}-full.pkl")
-
 # def process_2022():
 #     states = ['al', 'ar', 'az', 'ca', 'co', 'ct', 'dc', 'de', 'fl', 'ga', 'ia', 'id', 'il', 'in', 'ks', 'ky', 'la', 'ma', 'md', 'me', 'mi', 'mn', 'mo', 'ms', 'mt', 'nc', 'nd', 'ne', 'nh', 'nj', 'nm', 'nv', 'ny', 'oh', 'ok', 'or', 'pa', 'ri', 'sc', 'sd', 'tn', 'tx', 'ut', 'va', 'vt', 'wa', 'wi', 'wv', 'wy']
     
@@ -117,7 +112,7 @@ for year in years:
 def combine_years():
     dfs = []
     for year in range(2019, 2022):
-        df = pd.read_pickle(f"{cemsdirreg}/emissions_all_unit_{year}.pkl")
+        df = pd.read_pickle(f"{cemsdirreg}/plants and units in cems {year}.pkl")
         dfs.append(df)
     
     combined_df = pd.concat(dfs, ignore_index=True)

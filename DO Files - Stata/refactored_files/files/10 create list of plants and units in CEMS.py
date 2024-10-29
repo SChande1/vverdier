@@ -11,49 +11,6 @@ datadir = gr.config['data_dir']
 states = gr.us_states
 
 
-
-# def process_year(year):
-
-    
-
-#     for state in states:
-#         df = pd.read_pickle(f"{tempdir}\\{state}\\emissions_co2_unit_{year}.pkl")
-#         print(f"Processing {state} for {year}")
-
-
-
-#         df = df.rename(columns={
-#             'SO2 Mass (lbs)': 'SO2MASS',
-#             'NOx Mass (lbs)': 'NOXMASS',
-#             'CO2 Mass (short tons)': 'CO2MASS',
-#             'so2_mass': 'SO2MASS',
-#             'nox_mass': 'NOXMASS',
-#             'co2_mass': 'CO2MASS',
-#             'Heat Input (mmBtu)': 'HEAT',
-#             'Gross Load (MW)': 'GLOAD',
-#             'Facility ID': 'PLANT',
-#             'Hour': 'HOUR',
-#             'Unit ID': 'unitid'
-#         })
-
-#         df['unitid'] = df['unitid'].astype(str).str.lstrip('0')
-#         df['maxgload'] = df.groupby('PLANT')['GLOAD'].transform('max')
-#         df = df[df['maxgload'] != 0]
-#         df['yr'] = year
-
-#         df = df[['PLANT', 'unitid', 'yr']].sort_values(['PLANT', 'unitid', 'yr']).drop_duplicates()
-
-#         if state != 'al':
-#             previous_df = pd.read_pickle(f"{tempdir}/{state}/emissions_co2_unit_{year}.pkl")
-#             df = pd.concat([previous_df, df], ignore_index=True)
-
-        
-
-#     df.to_pickle(f"{cemsdirreg}/plants and units in cems {year}.pkl")
-#     os.remove(f"{tempdir}/{state}emissions_co2_unit_{year}.pkl")
-
-
-
 # def process_2022():
 #     states = ['al', 'ar', 'az', 'ca', 'co', 'ct', 'dc', 'de', 'fl', 'ga', 'ia', 'id', 'il', 'in', 'ks', 'ky', 'la', 'ma', 'md', 'me', 'mi', 'mn', 'mo', 'ms', 'mt', 'nc', 'nd', 'ne', 'nh', 'nj', 'nm', 'nv', 'ny', 'oh', 'ok', 'or', 'pa', 'ri', 'sc', 'sd', 'tn', 'tx', 'ut', 'va', 'vt', 'wa', 'wi', 'wv', 'wy']
 
@@ -83,13 +40,10 @@ states = gr.us_states
 #     os.remove(f"{tempdir}/emissions_co2_unit_2022.pkl")
 
 def make_plant_list():
-    for year in range(2019, 2023):
+    for year in range(2019, 2022):
         df = pd.read_pickle(f"{cemsdirreg}/plants and units in cems {year}.pkl")
         df = df.drop('unitid', axis=1).drop_duplicates()
         df.to_pickle(f"{cemsdirreg}/plants in cems {year}.pkl")
 
-if __name__ == "__main__":
-    for year in [2019, 2020, 2021]:
-    #     process_year(year)
-    # process_2022()
-        make_plant_list()
+
+make_plant_list()
