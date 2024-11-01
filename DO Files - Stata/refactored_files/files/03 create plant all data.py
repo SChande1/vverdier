@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 from downloads.globals_regular import config
+
+
 # Set up paths
 raw_data_dir = config['rawdata_dir']
 data_dir = config['data_dir']
@@ -12,32 +14,33 @@ cemsdirreg = config['cems_dirreg']
 # make master plant file with plant orispl codes, fips, interconnection, NERC Regions, NERC subregions, EIA 930 regions, Balancing Authority Code, so2 and nox damages in dollars per pound in 2020 dollars
 
 # use new crosswalk from BA to region downloaded 11/30/22
-ba_region_crosswalk = pd.read_excel(raw_data_dir/"eia930/EIA930_Reference_Tables.xlsx")
+ba_region_crosswalk = pd.read_excel(f"{raw_data_dir}/EIA930/EIA930_Reference_Tables.xlsx")
 ba_region_crosswalk = ba_region_crosswalk.rename(columns={
-    'BACode': 'bacode',
-    'BAName': 'baname_930',
-    'TimeZone': 'timezone',
-    'RegionCountryName': 'region'
+    'BA Code': 'bacode',
+    'BA Name': 'baname_930',
+    'Time Zone': 'timezone',
+    'Region/Country Name': 'region'
 })
+print(ba_region_crosswalk.columns)
 ba_region_crosswalk = ba_region_crosswalk[['bacode', 'baname_930', 'timezone', 'region']]
-ba_region_crosswalk.to_stata(f"{data_dir}/BalancingAuthority_Region_crosswalk21.dta")
+ba_region_crosswalk.to_pickle(f"{data_dir}/BalancingAuthority_Region_crosswalk21.pkl")
 
 # make master list of all plants in CEMS data from 2019-2022
 cems_plant_list = pd.concat([
-    pd.read_stata(f"{cemsdirreg}/plants in cems {year}.dta") for year in range(2019, 2023)
+    pd.read_pickle(f"{cemsdirreg}/plants in cems {year}.pkl") for year in range(2019, 2022)
 ])
-cems_plant_list.to_stata(f"{data_dir}/cems_plant_list_19-22.dta")
+cems_plant_list.to_pickle(f"{data_dir}/cems_plant_list_19-22.pkl")
 
 # epa file with plant, name, state and city
-epa_crosswalk = pd.read_excel(raw_data_dir / "epa/oris-ghgrp_crosswalk_public_ry14_final.xlsx", skiprows=3)
-epa_crosswalk['PlantCode'] = pd.to_numeric(epa_crosswalk['ORISCODE'], errors='coerce')
+epa_crosswalk = pd.read_excel(f"{raw_data_dir}/EIA930/oris-ghgrp_crosswalk_public_ry14_final.xls", skiprows=3)
+epa_crosswalk['PlantCode'] = pd.to_numeric(epa_crosswalk['ORIS CODE'], errors='coerce')
 epa_crosswalk = epa_crosswalk.dropna(subset=['PlantCode'])
-epa_crosswalk = epa_crosswalk[['PlantCode', 'GHGRPState', 'FACILITYNAME', 'GHGRPCity']]
+epa_crosswalk = epa_crosswalk[['PlantCode', 'GHGRP - State', 'FACILITY NAME', 'GHGRP - City']]
 epa_crosswalk = epa_crosswalk.drop_duplicates(subset=['PlantCode'], keep='first')
-epa_crosswalk.to_stata(temp_dir / "temp7.dta")
+epa_crosswalk.to_pickle(f"{temp_dir}/temp7.pkl")
 
 # EIA 860 information about plants
-eia_860_plant = pd.read_excel(raw_data_dir / "EIA860/2___Plant_Y2021.xlsx", skiprows=1)
+eia_860_plant = pd.read_excel(f"{raw_data_dir}/EIA860/2___Plant_Y2021.xlsx", skiprows=1)
 eia_860_plant = eia_860_plant[['PlantCode', 'PlantName', 'City', 'State', 'Zip', 'County', 'Latitude', 'Longitude', 'NERCRegion', 'BalancingAuthorityCode', 'BalancingAuthorityName']]
 eia_860_plant.to_stata(temp_dir / "temp2.dta")
 

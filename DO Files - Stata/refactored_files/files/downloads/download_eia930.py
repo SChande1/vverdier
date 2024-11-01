@@ -76,4 +76,18 @@ def convert_excel_to_csv(region):
     pd.read_excel(excel_file_path).to_csv(csv_file_path, index=False)
     os.remove(excel_file_path)
 
+def download_reference_tables():
+    url = 'https://www.eia.gov/electricity/930-content/EIA930_Reference_Tables.xlsx'
+    r = requests.get(url, allow_redirects=True)
+    with open(os.path.join(subfolder_path, 'EIA930_Reference_Tables.xlsx'), 'wb') as file:
+        file.write(r.content)
+
+def download_crosswalk():
+    url = 'https://www.epa.gov/sites/default/files/2015-10/oris-ghgrp_crosswalk_public_ry14_final.xls'
+    r = requests.get(url, allow_redirects=True)
+    with open(os.path.join(subfolder_path, 'oris-ghgrp_crosswalk_public_ry14_final.xls'), 'wb') as file:
+        file.write(r.content)
+
+
+
 # main()

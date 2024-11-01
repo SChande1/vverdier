@@ -79,21 +79,53 @@ df.to_csv(os.path.join(gr.config['rawdata_dir'], "EIANuke", "nuclear_generation.
 # Check consistency with EIA930 data
 def check_consistency(df, eia930_df, group_by):
     df_grouped = df.groupby(['utcdate', 'utchour', group_by])['generation'].sum().reset_index()
-    eia930_grouped = eia930_df.groupby(['utcdate', 'utchour', group_by])['gennuke'].sum().reset_index()
+
+    eia930_grouped = eia930_df.groupby(['utcdate', 'utchour', group_by])['ng: nuc'].sum().reset_index()
     
     merged = pd.merge(df_grouped, eia930_grouped, on=['utcdate', 'utchour', group_by])
     
     for name, group in merged.groupby(group_by):
         print(f"{group_by}: {name}")
-        model = np.polyfit(group['generation'], group['gennuke'], 1)
+        model = np.polyfit(group['generation'], group['ng: nuc'], 1)
         print(f"Slope: {model[0]}, Intercept: {model[1]}")
         print("---")
 
 # Load EIA930 data
 eia930_df = pd.read_csv(r"C:\Users\shrey\Desktop\UNC CH Verdier\DO Files - Stata\refactored_files\rawdata_dir\EIA930\Hourly_Regional_Load_Generation.csv")
+
+
+# Try this conversion instead
+try:
+    # Option 1: Using ISO format
+    eia930_df['utcdate'] = pd.to_datetime(eia930_df['utcdate'], format='ISO8601')
+except:
+    try:
+        # Option 2: Using mixed format
+        eia930_df['utcdate'] = pd.to_datetime(eia930_df['utcdate'], format='mixed')
+    except:
+        # Option 3: Most flexible approach
+        def clean_datetime(x):
+            if pd.isna(x):
+                return None
+            try:
+                # Remove any extra whitespace
+                x = str(x).strip()
+                return pd.to_datetime(x)
+            except:
+                print(f"Problem converting date: {x}")
+                return None
+
+        eia930_df['utcdate'] = eia930_df['utcdate'].apply(clean_datetime)
+
+# If you only want the date portion (no time):
+eia930_df['utcdate'] = pd.to_datetime(eia930_df['utcdate']).dt.date
+
+
 eia930_df['utcdate'] = pd.to_datetime(eia930_df['utcdate'])
 eia930_df['inter'] = np.where(eia930_df['region'].isin(['CAL', 'SW', 'NW']), 'West',
                               np.where(eia930_df['region'] == 'TEX', 'Texas', 'East'))
+
+print(eia930_df.columns)
 
 # Check consistency by interconnection
 check_consistency(df, eia930_df, 'inter')
@@ -103,11 +135,11 @@ all_regions = eia930_df['region'].unique()
 check_consistency(df, eia930_df, 'region')
 
 # Look at whole country
-eia930_country = eia930_df[eia930_df['utcdate'] > '2019-01-01'].groupby(['utcdate', 'utchour'])['gennuke'].sum().reset_index()
+eia930_country = eia930_df[eia930_df['utcdate'] > '2019-01-01'].groupby(['utcdate', 'utchour'])['ng: nuc'].sum().reset_index()
 df_country = df[df['period'] > 20190101].groupby(['utcdate', 'utchour'])['generation'].sum().reset_index()
 
 merged_country = pd.merge(df_country, eia930_country, on=['utcdate', 'utchour'])
-plt.scatter(merged_country['generation'], merged_country['gennuke'])
+plt.scatter(merged_country['generation'], merged_country['ng: nuc'])
 plt.xlabel('Nuclear Generation (Our Data)')
 plt.ylabel('Nuclear Generation (EIA930)')
 plt.title('Comparison of Nuclear Generation Data')

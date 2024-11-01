@@ -14,8 +14,8 @@ config = {
 }
 
 def main():
-    for path in config.values():
-        if not os.path.exists(path):
+    for key, path in config.items():
+        if key not in ['api_key_EIA', 'api_key_EPA'] and not os.path.exists(path):
             os.makedirs(path)
 
 # Regions

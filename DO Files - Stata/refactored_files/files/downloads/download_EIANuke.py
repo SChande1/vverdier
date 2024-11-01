@@ -4,7 +4,7 @@ import globals_regular as globals_regular, os, requests, time, pandas as pd, num
 
 rawdata_dir = globals_regular.config['rawdata_dir']
 EIANuke_path = os.path.join(rawdata_dir, 'EIANuke')
-api_key = globals_regular.config['api_key']
+api_key = globals_regular.config['api_key_EIA']
 
 dfs_capacity = []
 dfs_outages = []
