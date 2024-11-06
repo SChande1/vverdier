@@ -81,3 +81,7 @@ def download_facility_attributes():
         'facilityId': 'PLANT'
         }).drop_duplicates()
     epa_facility.to_pickle(f"{cemsdir}/facility-attributes.pkl")
+
+def main():
+    download_bulk_files()
+    download_facility_attributes()

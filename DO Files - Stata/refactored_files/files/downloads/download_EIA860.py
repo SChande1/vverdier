@@ -23,4 +23,5 @@ def download_eia860():
     os.remove(zip_path)
 
 
-download_eia860()
+def main():
+    download_eia860()

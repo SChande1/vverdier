@@ -10,9 +10,12 @@ urls = {
     2021: "https://www.epa.gov/system/files/documents/2023-01/eGRID2021_data.xlsx",
     2022: "https://www.epa.gov/system/files/documents/2024-01/egrid2022_data.xlsx"
 }
+def download_egrid():
+    for year, url in urls.items():
+        response = requests.get(url)
+        output_path = f"{rawdata_dir}/egrid/egrid{year}_data.xlsx"
+        with open(output_path, 'wb') as f:
+            f.write(response.content)
 
-for year, url in urls.items():
-    response = requests.get(url)
-    output_path = f"{rawdata_dir}/egrid/egrid{year}_data.xlsx"
-    with open(output_path, 'wb') as f:
-        f.write(response.content)
+def main():
+    download_egrid()
