@@ -1,7 +1,7 @@
 import pandas as pd, requests, os, sys, json
 from datetime import date, datetime, timezone
 import globals_regular as gr
-import downloads.globals_regular as gr
+
 
 states = gr.us_states
 cemsdir = gr.config['cems_dir']
@@ -13,7 +13,7 @@ parameters = {
     'api_key': api_key_EPA,
 }
 
-def main():
+def download_bulk_files():
     r = requests.get(r"https://api.epa.gov/easey/camd-services/bulk-files", params=parameters)
 
     print("Status code: "+str(r.status_code))
@@ -54,3 +54,30 @@ def main():
                 file_path = os.path.join(cemsdir, state, year + '.csv')
                 with open(file_path, 'wb') as f:
                     f.write(response.content)
+
+def download_facility_attributes():
+    # Download facility attributes
+    parameters = {
+        'api_key': api_key_EPA,
+        'year': '2019|2020|2021|2022',
+    }
+
+    streamingUrl = "https://api.epa.gov/easey/streaming-services/facilities/attributes"
+    streamingResponse = requests.get(streamingUrl, params=parameters)
+
+    # printing the response error message if the response is not successful
+    print("Status code: "+str(streamingResponse.status_code))
+    if (int(streamingResponse.status_code) > 399):
+        sys.exit("Error message: "+streamingResponse.json()['error']['message'])
+
+    # collecting data as a data frame
+    streamingResponse_df = pd.DataFrame(streamingResponse.json())
+    streamingResponse_df.to_pickle(f"{cemsdir}/facility-attributes.pkl")
+
+    epa_facility = pd.read_pickle(f"{cemsdir}/facility-attributes.pkl")
+    epa_facility = epa_facility[['facilityId', 'fipsCode', 'nercRegion']]
+    epa_facility = epa_facility.rename(columns={
+        'fipsCode': 'FIPSEPACounty',
+        'facilityId': 'PLANT'
+        }).drop_duplicates()
+    epa_facility.to_pickle(f"{cemsdir}/facility-attributes.pkl")

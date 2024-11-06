@@ -22,4 +22,5 @@ def download_eia860():
     # Remove the zip file after extraction
     os.remove(zip_path)
 
+
 download_eia860()

@@ -1,7 +1,7 @@
-import globals_regular as globals_regular
+import downloads.globals_regular as gr
 import os, zipfile, requests
 
-rawdata_dir = globals_regular.config['rawdata_dir']
+rawdata_dir = gr.config['rawdata_dir']
 EIA923_path = os.path.join(rawdata_dir, 'EIA923')
 
 used_files = [
