@@ -74,8 +74,9 @@ def download_facility_attributes():
     streamingResponse_df = pd.DataFrame(streamingResponse.json())
     streamingResponse_df.to_pickle(f"{cemsdir}/facility-attributes.pkl")
 
+    print(streamingResponse_df.columns)
+
     epa_facility = pd.read_pickle(f"{cemsdir}/facility-attributes.pkl")
-    epa_facility = epa_facility[['facilityId', 'fipsCode', 'nercRegion']]
     epa_facility = epa_facility.rename(columns={
         'fipsCode': 'FIPSEPACounty',
         'facilityId': 'PLANT'
